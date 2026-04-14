@@ -1,0 +1,83 @@
+Q: 1
+Task 1 — Fetch Data from API
+TrendPulse: What's Actually Trending Right Now
+Marks: 20 | File: task1_data_collection.py
+
+Submission: Push your file to a public GitHub repo and share the direct link: https://github.com/<username>/trendpulse-<name>/blob/main/task1_data_collection.py
+
+⚠️ Anti-AI Policy: Write your own code. Comments explaining your logic count in your favour.
+
+The Project
+TrendPulse is a 4-part pipeline you'll build one task at a time:
+
+Task 1      →    Task 2      →    Task 3       →    Task 4
+Fetch JSON       Clean CSV        NumPy/Pandas      Visualise
+Start here. Each task uses the output of the previous one.
+
+What to Build
+HackerNews has a free, fully open API that returns trending stories as JSON — no login, no key, no sign-up needed.
+
+You will fetch trending stories and group them into 5 categories: technology, worldnews, sports, science, entertainment
+
+Assign a category to each story by checking whether its title contains any of these keywords:
+
+Category	Keywords to match (case-insensitive)
+technology	AI, software, tech, code, computer, data, cloud, API, GPU, LLM
+worldnews	war, government, country, president, election, climate, attack, global
+sports	NFL, NBA, FIFA, sport, game, team, player, league, championship
+science	research, study, space, physics, biology, discovery, NASA, genome
+entertainment	movie, film, music, Netflix, game, book, show, award, streaming
+Step 1 — Get the list of top story IDs:
+
+https://hacker-news.firebaseio.com/v0/topstories.json
+This returns a JSON array of story IDs (integers). Fetch the first 500.
+
+Step 2 — Get each story's details:
+
+https://hacker-news.firebaseio.com/v0/item/{id}.json
+This returns a single story object.
+
+Add this header to your requests:
+
+headers = {"User-Agent": "TrendPulse/1.0"}
+Tasks
+1 — Make the API Calls (8 marks)
+Use the requests library to fetch the top story IDs, then fetch each story's details
+If a request fails, print a message and move on — don't crash the script
+Wait 2 seconds between each category (time.sleep(2)) — one sleep per category loop, not per individual story fetch
+2 — Extract the Fields (7 marks)
+From each story, save these fields:
+
+Field	HackerNews field	Description
+post_id	id	Unique ID of the story
+title	title	Story title
+category	(your category)	The category you assigned based on keywords
+score	score	Number of upvotes
+num_comments	descendants	Number of comments
+author	by	Username of the story author
+collected_at	(add yourself)	The current date and time
+Collect up to 25 stories per category (125 total).
+
+3 — Save to a JSON File (5 marks)
+Create a folder called data/ if it doesn't exist
+Save all stories to a file like data/trends_20240115.json
+Print how many stories were collected in total
+Expected Output
+After running your script, you should have:
+
+A file at data/trends_YYYYMMDD.json
+At least 100 stories inside it
+A console message like: Collected 122 stories. Saved to data/trends_20240115.json
+Submission Checklist
+ Script runs without errors
+ JSON file saved in data/ folder
+ At least 100 stories collected
+ Each story has all 7 required fields
+ Code is commented
+Marks Breakdown
+Description	Marks
+1	Fetch from HackerNews API	8
+2	Extract required fields	7
+3	Save to JSON file	5
+Total	20
+Next: Task 2 will load this JSON file, clean it, and save it as a CSV.
