@@ -1,49 +1,40 @@
 import pandas as pd
-
-df = pd.DataFrame(stories)
-print(df.columns)
-df = df.rename(columns = {"id":"post_id","by":"author","descendants":"num_comments","score":"Number of upvotes"})
-
-df["time"] = pd.to_datetime(df["time"],unit='s')
-
-df["collected_at"]=pd.to_datetime("now")
-
-df["category"] ="technology"
-
-print(df.columns)
-
-categories = {
-    "technology": ["AI", "software", "tech", "code", "computer", "data", "cloud", "API", "GPU", "LLM"],
-    "worldnews": ["war", "government", "country", "president", "election", "climate", "attack", "global"],
-    "sports": ["NFL", "NBA", "FIFA", "sport", "game", "team", "player", "league", "championship"],
-    "science": ["research", "study", "space", "physics", "biology", "discovery", "NASA", "genome"],
-    "entertainment": ["movie", "film", "music", "Netflix", "game", "book", "show", "award", "streaming"]
-}
-
-categories_list = []
-
-for title in df["title"]:
-    title = str(title).lower()
-    assigned ="other"
-    for category,keywords in categories.items():
-        for word in keywords:
-            if word.lower() in title:
-                assigned = category
-                break
-        if assigned != "other":
-            break
-       
-      
-    categories_list.append(assigned)     
-
-df["category"] = categories_list
-
-print(df["category"])
-df= df.sort_values(by="Number of upvotes",ascending = False).groupby("category").head(25)
-
-# Save to CSV
 import os
-os.makedirs('data', exist_ok=True)
 
-df.to_csv('data/cleaned_trends.csv', index=False)
-print("Data saved to data/cleaned_trends.csv")
+# Load JSON
+file_path = "data/trends_20260414.json"  
+
+df = pd.read_json(file_path)
+
+print(f"Loaded {len(df)} stories from {file_path}")
+
+
+df = df.drop_duplicates(subset=["post_id"])
+print(f"After removing duplicates: {len(df)}")
+
+
+df = df.dropna(subset=["post_id", "title", "Number of upvotes"])
+print(f"After removing nulls: {len(df)}")
+
+
+df["Number of upvotes"] = df["Number of upvotes"].astype(int)
+df["num_comments"] = df["num_comments"].fillna(0).astype(int)
+
+
+df = df[df["Number of upvotes"] >= 5]
+print(f"After removing low scores: {len(df)}")
+
+
+df["title"] = df["title"].str.strip()
+
+
+os.makedirs("data", exist_ok=True)
+
+output_file = "data/trends_clean.csv"
+df.to_csv(output_file, index=False)
+
+print(f"Saved {len(df)} rows to {output_file}")
+
+
+print("\nStories per category:")
+print(df["category"].value_counts())
